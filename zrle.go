@@ -3,6 +3,7 @@ package zrle
 import (
 	"io"
 	"encoding/binary"
+	"compress/zlib"
 )
 
 func getLength(buf io.Reader) (uint32, error) {
@@ -12,4 +13,14 @@ func getLength(buf io.Reader) (uint32, error) {
 		return 0, err
 	}
 	return binary.BigEndian.Uint32(p), nil
+}
+
+func decode(buf io.Reader, length uint32) ([]byte, error) {
+	p := make([]byte, length)
+	r, err := zlib.NewReader(buf)
+	if err != nil {
+		return []byte{}, err
+	}
+	_, err = r.Read(p)
+	return p, err
 }
