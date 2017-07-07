@@ -2,9 +2,9 @@ package zrle
 
 import (
 	"bytes"
+	"compress/zlib"
 	"encoding/binary"
 	"testing"
-	"compress/zlib"
 )
 
 func TestReadsLength(t *testing.T) {
@@ -23,14 +23,18 @@ func TestReadsLength(t *testing.T) {
 
 func TestDecodesZlib(t *testing.T) {
 	bs := []byte("testtesttest")
-
 	buf := &bytes.Buffer{}
-	w := zlib.NewWriter(buf)
-	w.Write(bs)
-	
-	length := uint32(buf.Len())
 
-	decoded, err := decode(buf, length)
+	w := zlib.NewWriter(buf)
+	n, err := w.Write(bs)
+	if err != nil {
+		t.Error(err)
+	}
+	w.Flush()
+
+	encoded_length := uint32(n)
+
+	decoded, err := decode(buf, encoded_length)
 
 	// no error should be raised
 	if err != nil {

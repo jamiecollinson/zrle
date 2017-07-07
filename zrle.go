@@ -1,9 +1,9 @@
 package zrle
 
 import (
-	"io"
-	"encoding/binary"
 	"compress/zlib"
+	"encoding/binary"
+	"io"
 )
 
 func getLength(buf io.Reader) (uint32, error) {
