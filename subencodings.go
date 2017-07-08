@@ -1,5 +1,7 @@
 package zrle
 
+import ()
+
 type subencoding interface {
 	SubType() subType
 	String() string

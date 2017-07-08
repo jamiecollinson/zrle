@@ -1,18 +1,41 @@
 package zrle
 
-import ()
+import (
+	"io"
+)
 
 const (
 	TILE_WIDTH  int = 64
 	TILE_HEIGHT     = 64
 )
 
-// tile represents a subencoded tile
+type cpixel []byte
+
 type tile struct {
-	width    int
-	height   int
-	bytes    []byte
-	encoding subencoding
+	width          int
+	height         int
+	bytesPerCPixel int
+	pixels         []cpixel
+}
+
+type RawTile struct {
+	tile
+}
+
+func (t *RawTile) Read(buf io.Reader) (int, error) {
+	bytesToRead := t.width * t.height * t.bytesPerCPixel
+	bytesRead := 0
+	for bytesToRead > 0 {
+		pixel := make(cpixel, t.bytesPerCPixel)
+		n, err := buf.Read(pixel)
+		bytesRead += n
+		if err != nil {
+			return bytesRead, err
+		}
+		t.pixels = append(t.pixels, pixel)
+		bytesToRead -= len(pixel)
+	}
+	return bytesRead, nil
 }
 
 func createTiles(width int, height int) (tiles []tile) {
