@@ -12,10 +12,8 @@ const (
 type cpixel []byte
 
 type tile struct {
-	width          int
-	height         int
-	bytesPerCPixel int
-	pixels         []cpixel
+	width, height, bytesPerCPixel int
+	pixels                        []cpixel
 }
 
 type RawTile struct {
@@ -44,19 +42,20 @@ func createTiles(width int, height int) (tiles []tile) {
 
 		// If row is shorter than TILE_HEIGHT adjust
 		rowHeight := TILE_HEIGHT
-		height -= rowHeight
-		if height < 0 {
-			rowHeight += height
+		if height < rowHeight {
+			rowHeight = height
 		}
+		height -= rowHeight
 
 		for rowWidth > 0 {
 
 			// If tile is narrower than TILE_WIDTH adjust
 			tileWidth := TILE_WIDTH
-			rowWidth -= tileWidth
-			if rowWidth < 0 {
-				tileWidth += rowWidth
+			if rowWidth < tileWidth {
+				tileWidth = rowWidth
 			}
+			rowWidth -= tileWidth
+
 			newTile := tile{width: tileWidth, height: rowHeight}
 			tiles = append(tiles, newTile)
 		}

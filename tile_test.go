@@ -43,7 +43,7 @@ func TestCreateColumnOfTiles(t *testing.T) {
 	}
 	t2 := tiles[1]
 	if t2.width != 64 || t2.height != 64 {
-		t.Errorf("expected height and width 64, got %v", t1)
+		t.Errorf("expected height and width 64, got %v", t2)
 	}
 }
 

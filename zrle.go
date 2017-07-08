@@ -24,3 +24,8 @@ func decode(buf io.Reader, length uint32) ([]byte, error) {
 	_, err = r.Read(p)
 	return p, err
 }
+
+type ZRLEEncoding struct {
+	width, height int
+	data          []byte
+}
