@@ -25,45 +25,10 @@ func decode(buf io.Reader, length uint32) ([]byte, error) {
 	return p, err
 }
 
-// subEncoding takes a tile and returns an array of cpixels
-type subencoding interface {
-	decode() []cpixel
-	scheme() subencodingType
-}
-
-// cpixel represents a compressed pixel
-type cpixel []byte
-
 // tile represents a subencoded tile
 type tile struct {
 	width    int
 	height   int
-	encoding subencoding
-}
-
-func getSubencoding(buf io.Reader) (subencodingType, error) {
-	p := make([]byte, 1)
-	_, err := buf.Read(p)
-	if err != nil {
-		return invalid, err
-	}
-	b := p[0]
-
-	var encoding subencodingType
-	switch {
-	case b == 0:
-		encoding = raw
-	case b == 1:
-		encoding = solid
-	case b <= 16:
-		encoding = packedPalette
-	case b == 128:
-		encoding = rle
-	case b >= 130:
-		encoding = prle
-	default:
-		encoding = invalid
-	}
-
-	return encoding, nil
+	encoding subencodingType
+	bytes    []byte
 }
