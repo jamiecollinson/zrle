@@ -11,8 +11,8 @@ const (
 type tile struct {
 	width    int
 	height   int
-	encoding subencodingType
 	bytes    []byte
+	encoding subencoding
 }
 
 func createTiles(width int, height int) (tiles []tile) {
