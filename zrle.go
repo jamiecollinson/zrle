@@ -24,11 +24,3 @@ func decode(buf io.Reader, length uint32) ([]byte, error) {
 	_, err = r.Read(p)
 	return p, err
 }
-
-// tile represents a subencoded tile
-type tile struct {
-	width    int
-	height   int
-	encoding subencodingType
-	bytes    []byte
-}
