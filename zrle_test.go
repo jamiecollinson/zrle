@@ -51,3 +51,94 @@ func TestDecodesZlib(t *testing.T) {
 		t.Errorf("expected %v, got %v", bs, decoded)
 	}
 }
+
+func TestSubencodingDispatch(t *testing.T) {
+	buf := &bytes.Buffer{}
+
+	// RAW
+	buf.WriteByte(0)
+	subencoding, err := getSubencoding(buf)
+	if err != nil {
+		t.Error(err)
+	}
+	if subencoding != raw {
+		t.Errorf("expected %v, got %v", raw, subencoding)
+	}
+
+	// solid
+	buf.Reset()
+	buf.WriteByte(1)
+	subencoding, err = getSubencoding(buf)
+	if err != nil {
+		t.Error(err)
+	}
+	if subencoding != solid {
+		t.Errorf("expected %v, got %v", solid, subencoding)
+	}
+
+	// solid
+	buf.Reset()
+	buf.WriteByte(1)
+	subencoding, err = getSubencoding(buf)
+	if err != nil {
+		t.Error(err)
+	}
+	if subencoding != solid {
+		t.Errorf("expected %v, got %v", solid, subencoding)
+	}
+
+	// packedPalette
+	buf.Reset()
+	buf.WriteByte(5)
+	subencoding, err = getSubencoding(buf)
+	if err != nil {
+		t.Error(err)
+	}
+	if subencoding != packedPalette {
+		t.Errorf("expected %v, got %v", packedPalette, subencoding)
+	}
+
+	// 17-127 invalid
+	buf.Reset()
+	buf.WriteByte(20)
+	subencoding, err = getSubencoding(buf)
+	if err != nil {
+		t.Error(err)
+	}
+	if subencoding != invalid {
+		t.Errorf("expected %v, got %v", invalid, subencoding)
+	}
+
+	// RLE
+	buf.Reset()
+	buf.WriteByte(128)
+	subencoding, err = getSubencoding(buf)
+	if err != nil {
+		t.Error(err)
+	}
+	if subencoding != rle {
+		t.Errorf("expected %v, got %v", rle, subencoding)
+	}
+
+	// 129 invalid
+	buf.Reset()
+	buf.WriteByte(129)
+	subencoding, err = getSubencoding(buf)
+	if err != nil {
+		t.Error(err)
+	}
+	if subencoding != invalid {
+		t.Errorf("expected %v, got %v", invalid, subencoding)
+	}
+
+	// PRLE
+	buf.Reset()
+	buf.WriteByte(130)
+	subencoding, err = getSubencoding(buf)
+	if err != nil {
+		t.Error(err)
+	}
+	if subencoding != prle {
+		t.Errorf("expected %v, got %v", prle, subencoding)
+	}
+}
