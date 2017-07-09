@@ -1,6 +1,7 @@
 package zrle
 
 import (
+	"errors"
 	"io"
 )
 
@@ -44,11 +45,7 @@ type prleEncoding struct{}
 
 func (prleEncoding) SubType() subType { return prle }
 
-type nullEncoding struct{}
-
-func (nullEncoding) SubType() subType { return invalid }
-
-func getSubencoding(b byte) (encoding subencoding) {
+func getSubencoding(b byte) (encoding subencoding, err error) {
 	switch {
 	case b == 0:
 		encoding = rawEncoding{}
@@ -61,7 +58,7 @@ func getSubencoding(b byte) (encoding subencoding) {
 	case b >= 130:
 		encoding = prleEncoding{}
 	default:
-		encoding = nullEncoding{}
+		err = errors.New("No valid encoding")
 	}
 	return
 }

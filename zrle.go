@@ -49,5 +49,3 @@ func (e *ZRLEEncoding) Read(buf io.Reader) (err error) {
 	e.data, err = e.decode(buf, n)
 	return
 }
-
-func (e *ZRLEEncoding) ToPixels() {}

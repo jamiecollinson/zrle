@@ -8,5 +8,4 @@ const (
 	packedPalette
 	rle
 	prle
-	invalid
 )
