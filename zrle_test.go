@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"compress/zlib"
 	"encoding/binary"
+	"io"
+	"reflect"
 	"testing"
 )
 
@@ -49,5 +51,24 @@ func TestDecodesZlib(t *testing.T) {
 	// decoded should be original
 	if !bytes.Equal(decoded, bs) {
 		t.Errorf("expected %v, got %v", bs, decoded)
+	}
+}
+
+func TestZRLERead(t *testing.T) {
+	enc := ZRLEEncoding{
+		getLength: func(buf io.Reader) (uint32, error) { return 1, nil },
+		decode: func(buf io.Reader, length uint32) ([]byte, error) {
+			p := make([]byte, length)
+			_, err := buf.Read(p)
+			if err != nil {
+				return p, err
+			}
+			return p, nil
+		},
+	}
+	buf := bytes.NewBuffer([]byte{1})
+	enc.Read(buf)
+	if !reflect.DeepEqual(enc.data, []byte{1}) {
+		t.Errorf("expected %v, got %v", []byte{1}, enc.data)
 	}
 }

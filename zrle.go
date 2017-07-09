@@ -28,4 +28,20 @@ func decode(buf io.Reader, length uint32) ([]byte, error) {
 type ZRLEEncoding struct {
 	width, height int
 	data          []byte
+	getLength     func(io.Reader) (uint32, error)
+	decode        func(io.Reader, uint32) ([]byte, error)
+}
+
+func NewZRLEEncoding(width, height int) *ZRLEEncoding {
+	return &ZRLEEncoding{
+		width:     width,
+		height:    height,
+		getLength: getLength,
+		decode:    decode,
+	}
+}
+
+func (e *ZRLEEncoding) Read(buf io.Reader) {
+	n, _ := e.getLength(buf)
+	e.data, _ = e.decode(buf, n)
 }
