@@ -41,7 +41,13 @@ func NewZRLEEncoding(width, height int) *ZRLEEncoding {
 	}
 }
 
-func (e *ZRLEEncoding) Read(buf io.Reader) {
-	n, _ := e.getLength(buf)
-	e.data, _ = e.decode(buf, n)
+func (e *ZRLEEncoding) Read(buf io.Reader) (err error) {
+	n, err := e.getLength(buf)
+	if err != nil {
+		return err
+	}
+	e.data, err = e.decode(buf, n)
+	return
 }
+
+func (e *ZRLEEncoding) ToPixels() {}

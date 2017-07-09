@@ -1,41 +1,52 @@
 package zrle
 
-import ()
+import (
+	"io"
+)
 
 type subencoding interface {
 	SubType() subType
-	String() string
 }
 
 type rawEncoding struct{}
 
-func (e rawEncoding) SubType() subType { return raw }
-func (e rawEncoding) String() string   { return "Raw" }
+func (rawEncoding) SubType() subType { return raw }
+
+func (rawEncoding) Read(buf io.Reader, t *tile) (int, error) {
+	bytesToRead := t.width * t.height * t.bytesPerCPixel
+	bytesRead := 0
+	for bytesToRead > 0 {
+		pixel := make(cpixel, t.bytesPerCPixel)
+		n, err := buf.Read(pixel)
+		bytesRead += n
+		if err != nil {
+			return bytesRead, err
+		}
+		t.pixels = append(t.pixels, pixel)
+		bytesToRead -= len(pixel)
+	}
+	return bytesRead, nil
+}
 
 type solidEncoding struct{}
 
-func (e solidEncoding) SubType() subType { return solid }
-func (e solidEncoding) String() string   { return "Solid" }
+func (solidEncoding) SubType() subType { return solid }
 
 type packedPaletteEncoding struct{}
 
-func (e packedPaletteEncoding) SubType() subType { return packedPalette }
-func (e packedPaletteEncoding) String() string   { return "PackedPalette" }
+func (packedPaletteEncoding) SubType() subType { return packedPalette }
 
 type rleEncoding struct{}
 
-func (e rleEncoding) SubType() subType { return rle }
-func (e rleEncoding) String() string   { return "RLE" }
+func (rleEncoding) SubType() subType { return rle }
 
 type prleEncoding struct{}
 
-func (e prleEncoding) SubType() subType { return prle }
-func (e prleEncoding) String() string   { return "PRLE" }
+func (prleEncoding) SubType() subType { return prle }
 
 type nullEncoding struct{}
 
-func (e nullEncoding) SubType() subType { return invalid }
-func (e nullEncoding) String() string   { return "INVALID" }
+func (nullEncoding) SubType() subType { return invalid }
 
 func getSubencoding(b byte) (encoding subencoding) {
 	switch {
